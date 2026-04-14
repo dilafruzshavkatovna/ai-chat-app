@@ -2,12 +2,6 @@
 
 Bu dastur kompyuteringizda AI bilan suhbatlashish imkoniyatini beradi.
 
-## Nima uchun kerak?
-
-- Frontend: oddiy HTML, CSS va JavaScript
-- Backend: Node.js va Express
-- AI: Groq API
-
 ## Kerakli fayllar
 
 - `server.js`
