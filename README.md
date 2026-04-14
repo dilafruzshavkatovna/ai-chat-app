@@ -1,54 +1,79 @@
-# AI Chat App – Oddiy Chat Dasturi
+# AI Chat App
 
-Bu dastur sizga AI bilan suhbatlashish imkonini beradi. Siz matn yozasiz, AI javob beradi.
+Bu dastur kompyuteringizda AI bilan suhbatlashish imkoniyatini beradi.
 
-##Qanday qilib o‘z kompyuteringizda ishga tushirasiz?
+## Nima uchun kerak?
 
-### 1. Groq API kalitini oling
-- Brauzeringizni ochib, bu erga kiring: https://console.groq.com/
-- Ro‘yxatdan o‘ting (yangi hisob yarating).
-- API kalit (maxfiy kod) yarating va uni ko‘chirib oling.
+- Frontend: oddiy HTML, CSS va JavaScript
+- Backend: Node.js va Express
+- AI: Groq API
 
-### 2. Backend qismini ishga tushiring (server)
+## Kerakli fayllar
 
-Kompyuteringizda terminal (buyruq oynasi) oching va quyidagi buyruqlarni birin-ketin yozing:
+- `server.js`
+- `package.json`
+- `.env.example`
+- `public/index.html`
+- `public/app.js`
+- `public/styles.css`
+
+## O‘rnatish
+
+1. Loyihani kompyuteringizga yuklab oling yoki papkani oching.
+2. Terminalni oching va loyiha papkasiga kiring:
 
 ```bash
-cd backend                # backend papkasiga o‘tish
-npm install               # kerakli qo‘shimcha dasturlarni o‘rnatish
-cp .env.example .env      # .env faylini yaratish
+cd ai-chat-app
+```
 
-## Endi .env faylini bloknot bilan oching va ichiga shuni yozing:
+3. Paketlarni o‘rnating:
 
+```bash
+npm install
+```
+
+4. `.env` faylini yarating:
+
+```bash
+copy .env.example .env
+```
+
+5. `.env` faylini matn muharririda oching va Groq API kalitini qo‘shing:
+
+```text
 GROQ_API_KEY=gsk_sizning_kalitingiz
-(gsk_sizning_kalitingiz o‘rniga o‘zingizning haqiqiy kalitingizni qo‘ying)
+```
 
-Keyin serverni ishga tushiring:
+## Serverni ishga tushirish
+
+Terminalda quyidagilarni yozing:
 
 ```bash
 node server.js
-Terminalda shunday xabar chiqishi kerak: 'Server ishga tushdi: http://localhost:3000'
+```
 
-### 3. Endi Frontend qismini oching
-frontend papkasidagi index.html faylini ikki marta bosing. U brauzeringizda ochiladi.
+Agar hammasi to‘g‘ri bo‘lsa, quyidagi xabar chiqadi:
 
-Endi siz chat oynasiga matn yozib, AI dan javob olishingiz mumkin.
+```text
+Server ishga tushdi: http://localhost:3000
+```
 
-### Eslatma: Server ishlamay turib, chat ishlamaydi. Avval serverni ishga tushirishingiz shart.
+## Frontendni ochish
 
-## Dasturda nima ishlatilgan?
-Frontend – oddiy HTML, CSS, JavaScript (hech qanday qo‘shimcha kerak emas)
+Brauzeringizda quyidagi manzilni oching:
 
-Backend – Node.js va Express.js
+```text
+http://localhost:3000
+```
 
-AI – Groq API (model nomi: moonshotai/kimi-k2-instruct-0905) bu Apreldagi oxirgi model)
+Endi matn yozib, AI javobini olishingiz mumkin.
 
-Xavfsizlik – API kaliti .env faylida saqlanadi va GitHub ga yuklanmaydi
+## Muammolar
 
-## Agar muammo bo‘lsa?
-Terminalda qizil rangli xatolarni o‘qing. Ular nima noto‘g‘ri ekanligini tushuntiradi.
+- Agar server ishlamasa, chat ham ishlamaydi.
+- `GROQ_API_KEY` topilmasa, `.env` fayli to‘g‘ri joyda ekanini va kalit to‘g‘ri yozilganini tekshiring.
+- Agar `Port 3000` band bo‘lsa, `server.js` dagi portni `3001` ga o‘zgartiring.
 
-Groq API kaliti to‘g‘riligini tekshiring.
+## Eslatma
 
-Server ishlayotganiga ishonch hosil qiling (terminalda node server.js yozilgan bo‘lishi kerak).
-
+API kaliti maxfiy bo‘lib, GitHub yoki boshqa omma uchun ochiq joyda bo‘lmasligi kerak.
