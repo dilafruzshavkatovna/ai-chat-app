@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Chat</title>
+    <style>
+      /* ========== UMUMIY USLUBLAR ========== */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f0f2f5;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* ========== CHAT OYNASI ========== */
+      .chat-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 700px;
+        height: 90vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      /* Sarlavha */
+      .chat-header {
+        background: #2563eb;
+        color: white;
+        padding: 16px 20px;
+        font-size: 18px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .status-dot {
+        width: 10px;
+        height: 10px;
+        background: #4ade80;
+        border-radius: 50%;
+      }
+
+      /* Xabarlar ko'rsatiladigan joy */
+      .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      /* Har bir xabar */
+      .message {
+        display: flex;
+        gap: 10px;
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Foydalanuvchi xabarlari o'ngda */
+      .message.user {
+        flex-direction: row-reverse;
+      }
+
+      /* Avatar (dastlabki harf) */
+      .avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+
+      .message.user .avatar {
+        background: #2563eb;
+        color: white;
+      }
+
+      .message.ai .avatar {
+        background: #e5e7eb;
+        color: #374151;
+      }
+
+      /* Xabar matni */
+      .message-content {
+        max-width: 75%;
+        padding: 10px 14px;
+        border-radius: 12px;
+        font-size: 14px;
+        line-height: 1.6;
+        word-wrap: break-word;
+      }
+
+      .message.user .message-content {
+        background: #2563eb;
+        color: white;
+        border-bottom-right-radius: 3px;
+      }
+
+      .message.ai .message-content {
+        background: #f3f4f6;
+        color: #1f2937;
+        border-bottom-left-radius: 3px;
+      }
+
+      /* Xato xabari */
+      .message.error .message-content {
+        background: #fee2e2;
+        color: #dc2626;
+      }
+
+      /* Yozilmoqda animatsiyasi */
+      .typing-dots span {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        background: #9ca3af;
+        border-radius: 50%;
+        margin: 0 2px;
+        animation: bounce 1s infinite;
+      }
+
+      .typing-dots span:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .typing-dots span:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      @keyframes bounce {
+        0%,
+        80%,
+        100% {
+          transform: translateY(0);
+        }
+        40% {
+          transform: translateY(-6px);
+        }
+      }
+
+      /* ========== XABAR YUBORISH QISMI ========== */
+      .chat-input-area {
+        padding: 16px;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+      }
+
+      textarea {
+        flex: 1;
+        border: 1.5px solid #d1d5db;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 14px;
+        font-family: inherit;
+        resize: none;
+        min-height: 42px;
+        max-height: 120px;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+
+      textarea:focus {
+        border-color: #2563eb;
+      }
+
+      button {
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 18px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+        height: 42px;
+        white-space: nowrap;
+      }
+
+      button:hover:not(:disabled) {
+        background: #1d4ed8;
+      }
+
+      button:active:not(:disabled) {
+        transform: scale(0.97);
+      }
+
+      button:disabled {
+        background: #93c5fd;
+        cursor: not-allowed;
+      }
+
+      /* Boshlang'ich xabar */
+      .welcome-msg {
+        text-align: center;
+        color: #9ca3af;
+        font-size: 14px;
+        margin: auto;
+        padding: 20px;
+      }
+
+      .welcome-msg h3 {
+        font-size: 18px;
+        color: #6b7280;
+        margin-bottom: 8px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="chat-container">
+      <!-- Sarlavha -->
+      <div class="chat-header">
+        <div class="status-dot"></div>
+        AI Chat Yordamchi
+      </div>
+
+      <!-- Xabarlar ko'rsatiladigan joy -->
+      <div class="chat-messages" id="messages">
+        <div class="welcome-msg">
+          <h3>👋 Salom!</h3>
+          <p>Menga istalgan savolingizni bering</p>
+        </div>
+      </div>
+
+      <!-- Xabar yozish va yuborish -->
+      <div class="chat-input-area">
+        <textarea
+          id="userInput"
+          placeholder="Xabar yozing... (Enter = yuborish, Shift+Enter = yangi qator)"
+          rows="1"
+        ></textarea>
+        <button id="sendBtn" onclick="sendMessage()">Yuborish</button>
+      </div>
+    </div>
+
+    <script>
+      // Backend serverning manzili
+      // Agar server boshqa portda bo'lsa, shu yerda o'zgartiring
+      const BACKEND_URL = "http://localhost:3000";
+
+      // Xabar yuborish funksiyasi
+      async function sendMessage() {
+        const input = document.getElementById("userInput");
+        const sendBtn = document.getElementById("sendBtn");
+        const message = input.value.trim();
+
+        // Bo'sh xabar yubormaslik
+        if (!message) return;
+
+        // Foydalanuvchi xabarini ekranda ko'rsatish
+        addMessage(message, "user");
+        input.value = "";
+        input.style.height = "42px";
+
+        // Tugmani vaqtincha o'chirish
+        sendBtn.disabled = true;
+        sendBtn.textContent = "...";
+
+        // "Yozilmoqda" animatsiyasini ko'rsatish
+        const typingId = showTyping();
+
+        try {
+          // ====== BACKENDGA SO'ROV YUBORISH ======
+          const response = await fetch(`${BACKEND_URL}/api/chat`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json", // JSON formatda yuboramiz
+            },
+            body: JSON.stringify({ message: message }), // Xabarni JSON ga aylantiramiz
+          });
+
+          // Javobni o'qish
+          const data = await response.json();
+
+          // Animatsiyani o'chirish
+          removeTyping(typingId);
+
+          if (response.ok) {
+            // Muvaffaqiyatli javobni ko'rsatish
+            addMessage(data.reply, "ai");
+          } else {
+            // Xato xabarini ko'rsatish
+            addMessage("Xato: " + (data.error || "Noma'lum xato"), "error");
+          }
+        } catch (error) {
+          // Tarmoq xatosi (masalan, server o'chibdi)
+          removeTyping(typingId);
+          addMessage(
+            "Server bilan ulanib bo'lmadi. Server ishga tushirilganini tekshiring.",
+            "error"
+          );
+          console.error("Xato:", error);
+        }
+
+        // Tugmani qayta yoqish
+        sendBtn.disabled = false;
+        sendBtn.textContent = "Yuborish";
+        input.focus();
+      }
+
+      // Xabarni ekranda ko'rsatish funksiyasi
+      function addMessage(text, type) {
+        const messages = document.getElementById("messages");
+
+        // Birinchi xabar kelganda, xush kelibsiz matnini olib tashlaymiz
+        const welcome = messages.querySelector(".welcome-msg");
+        if (welcome) welcome.remove();
+
+        // Avatar harfi
+        const avatarLetter = type === "user" ? "S" : "AI";
+
+        // Xabar elementi yaratish
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `message ${type}`;
+        messageDiv.innerHTML = `
+          <div class="avatar">${avatarLetter}</div>
+          <div class="message-content">${escapeHtml(text)}</div>
+        `;
+
+        messages.appendChild(messageDiv);
+
+        // Pastga scroll qilish
+        messages.scrollTop = messages.scrollHeight;
+      }
+
+      // "Yozilmoqda" animatsiyasini ko'rsatish
+      function showTyping() {
+        const messages = document.getElementById("messages");
+        const id = "typing-" + Date.now();
+
+        const typingDiv = document.createElement("div");
+        typingDiv.className = "message ai";
+        typingDiv.id = id;
+        typingDiv.innerHTML = `
+          <div class="avatar">AI</div>
+          <div class="message-content">
+            <div class="typing-dots">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+        `;
+
+        messages.appendChild(typingDiv);
+        messages.scrollTop = messages.scrollHeight;
+        return id;
+      }
+
+      // Animatsiyani o'chirish
+      function removeTyping(id) {
+        const el = document.getElementById(id);
+        if (el) el.remove();
+      }
+
+      // XSS hujumidan himoya - HTML belgilarini xavfsiz qilish
+      function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.appendChild(document.createTextNode(text));
+        return div.innerHTML;
+      }
+
+      // Enter tugmasi bilan xabar yuborish
+      document
+        .getElementById("userInput")
+        .addEventListener("keydown", function (e) {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault(); // Yangi qator qo'shilmasin
+            sendMessage();
+          }
+        });
+
+      // Textarea o'z-o'zidan kattalashishi
+      document
+        .getElementById("userInput")
+        .addEventListener("input", function () {
+          this.style.height = "42px";
+          this.style.height = Math.min(this.scrollHeight, 120) + "px";
+        });
+    </script>
+  </body>
+</html>
